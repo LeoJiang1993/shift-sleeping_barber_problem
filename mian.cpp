@@ -2,7 +2,8 @@
 #include <thread>
 #include <queue>
 #include <list>
-#include <Windows.h>
+#include <ctime>
+#include "time.h"
 #include <random>
 #include <mutex>
 
@@ -28,6 +29,14 @@ public:
 		return _id;
 	}
 };
+
+void m_threadSleep(int sec, int nsec) {
+	struct timespec sleepTime;
+	struct timespec returnTime;
+	sleepTime.tv_sec = sec;
+	sleepTime.tv_nsec = nsec;
+	nanosleep(&sleepTime, &returnTime);
+}
 
 Customer* nowServing;
 
@@ -106,7 +115,8 @@ public:
 				cout << "Barber cutting the hair of customer " << nowServing->id() << endl;
 				waitingList.print();
 				threadLock.unlock();
-				Sleep(getRandom(5) * 1000);
+				m_threadSleep(getRandom(5),0);
+				//Sleep(getRandom(5) * 1000);
 				threadLock.lock();
 				delete customer;
 				nowServing = nullptr;
@@ -135,7 +145,7 @@ int main() {
 		threadLock.lock();
 		waitingList.enQueue(new Customer(customerNo++));
 		threadLock.unlock();
-		Sleep(3000);
+		m_threadSleep(3, 0);
 	}
 	return 0;
 }
